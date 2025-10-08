@@ -5,7 +5,7 @@ import { FORM_IDS } from './common/constants/form-ids.js'
 
 const logger = createLogger()
 
-const now = new Date()
+const now = new Date().toISOString()
 const user = { id: 'example-user', displayName: 'Example user' }
 
 const author = {
@@ -13,6 +13,14 @@ const author = {
   createdBy: user,
   updatedAt: now,
   updatedBy: user
+}
+
+/**
+ * Generate a unique reference number for form submissions
+ * @returns {string} Reference number in format: NRF-{timestamp}-{random}
+ */
+function generateReferenceNumber() {
+  return `NRF-${Date.now()}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`
 }
 
 const metadata = {
@@ -122,7 +130,7 @@ const definition = {
         {
           type: 'YesNoField',
           title:
-            'Are you using any SuDS design details (Sustainable Drainage Systems (reed beds, ponds, swales)?',
+            'Are you using any SuDS design details (Sustainable Drainage Systems (reed beds, ponds, swales))?',
           name: FORM_IDS.SUDS,
           shortDescription: 'Using any SuDS',
           hint: 'These methods can retain or remove nutrients.',
@@ -252,7 +260,7 @@ const outputService = {
   ) {
     logger.info('Output service submit called')
 
-    const referenceNumber = `NRF-${Date.now()}`
+    const referenceNumber = generateReferenceNumber()
 
     const formData = {}
 
@@ -296,7 +304,7 @@ const formSubmissionService = {
   submit: async function (payload, request) {
     logger.info('Form submission service called')
 
-    const reference = `NRF-${Date.now()}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`
+    const reference = generateReferenceNumber()
 
     return {
       id: reference,
