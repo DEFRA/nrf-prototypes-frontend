@@ -1,6 +1,7 @@
 import Boom from '@hapi/boom'
 import { createLogger } from './common/helpers/logging/logger.js'
 import { ROUTES } from './common/constants/routes.js'
+import { FORM_IDS } from './common/constants/form-ids.js'
 
 const logger = createLogger()
 
@@ -57,7 +58,7 @@ const definition = {
         {
           type: 'FileUploadField',
           title: 'Draw a red line boundary or upload a shapefile (optional)',
-          name: 'AznCjb',
+          name: FORM_IDS.RED_LINE_BOUNDARY,
           shortDescription: 'Red line boundary',
           hint: 'Use the map to draw a red line boundary for where your development might be. If you already have a shapefile you can upload it for your Nature Restoration Fund levy estimate.',
           options: {
@@ -79,7 +80,7 @@ const definition = {
           type: 'CheckboxesField',
           title:
             'Enter the number of each type of building that might be included in this development',
-          name: 'trkPwJ',
+          name: FORM_IDS.BUILDING_TYPES,
           shortDescription: 'Building type counts',
           hint: 'Enter numbers in each box, enter a zero if you are not building that type.',
           list: 'e8715dc7-1fd6-429f-a9b5-9b2fa7dc533d',
@@ -100,7 +101,7 @@ const definition = {
         {
           type: 'RadiosField',
           title: 'How will your development deal with waste water?',
-          name: 'nulGtS',
+          name: FORM_IDS.WASTE_WATER,
           shortDescription: 'Dealing with waste water',
           hint: '',
           options: {
@@ -122,7 +123,7 @@ const definition = {
           type: 'YesNoField',
           title:
             'Are you using any SuDS design details (Sustainable Drainage Systems (reed beds, ponds, swales)?',
-          name: 'wwsVZv',
+          name: FORM_IDS.SUDS,
           shortDescription: 'Using any SuDS',
           hint: 'These methods can retain or remove nutrients.',
           options: {
@@ -142,7 +143,7 @@ const definition = {
         {
           type: 'EmailAddressField',
           title: 'Enter the email address you would like the estimate sent to',
-          name: 'HufJAD',
+          name: FORM_IDS.EMAIL,
           shortDescription: 'Email address',
           hint: '',
           options: {
