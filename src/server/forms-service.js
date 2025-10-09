@@ -2,6 +2,7 @@ import Boom from '@hapi/boom'
 import { createLogger } from './common/helpers/logging/logger.js'
 import { ROUTES } from './common/constants/routes.js'
 import { FORM_COMPONENT_NAMES } from './common/constants/form-component-names.js'
+import { FORM_METADATA } from './common/constants/form-metadata.js'
 
 const logger = createLogger()
 
@@ -24,8 +25,8 @@ function generateReferenceNumber() {
 }
 
 const metadata = {
-  id: 'nrf-quote-01',
-  slug: 'nrf-quote',
+  id: FORM_METADATA.ID,
+  slug: FORM_METADATA.SLUG,
   title: 'Nature Restoration Fund Quote',
   organisation: 'Defra',
   teamName: 'NRF Team',

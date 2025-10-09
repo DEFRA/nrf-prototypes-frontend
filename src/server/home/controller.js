@@ -1,4 +1,5 @@
 import { ROUTES } from '../common/constants/routes.js'
+import { FORM_METADATA } from '../common/constants/form-metadata.js'
 
 /**
  * A GDS styled example home page controller.
@@ -9,7 +10,7 @@ export const homeController = {
     return h.view('home/index', {
       pageTitle: 'Home',
       heading: 'Home',
-      startUrl: `/nrf-quote${ROUTES.START}`
+      startUrl: `/${FORM_METADATA.SLUG}${ROUTES.START}`
     })
   }
 }
