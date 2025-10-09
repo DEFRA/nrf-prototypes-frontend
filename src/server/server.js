@@ -18,6 +18,7 @@ import { secureContext } from '@defra/hapi-secure-context'
 import { contentSecurityPolicy } from './common/helpers/content-security-policy.js'
 import { context } from '../config/nunjucks/context/context.js'
 import services from './forms-service.js'
+import { BuildingTypesController } from './forms/controllers/BuildingTypesController.js'
 
 export async function createServer() {
   setupProxy()
@@ -74,12 +75,16 @@ export async function createServer() {
     plugin,
     options: {
       services,
+      controllers: {
+        BuildingTypesController
+      },
       nunjucks: {
         baseLayoutPath: 'layouts/page.njk',
         paths: [
           'node_modules/govuk-frontend/dist/',
           'src/server/common/templates',
-          'src/server/common/components'
+          'src/server/common/components',
+          'src/server/forms/views'
         ]
       },
       viewContext: context,

@@ -84,6 +84,7 @@ const definition = {
     {
       title: '',
       path: ROUTES.BUILDINGS,
+      controller: 'BuildingTypesController',
       components: [
         {
           type: 'CheckboxesField',
