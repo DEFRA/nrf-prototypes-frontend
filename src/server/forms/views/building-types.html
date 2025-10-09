@@ -1,23 +1,41 @@
-{% extends baseLayoutPath %}
+{% extends baseLayoutPath %} {% from "govuk/components/error-summary/macro.njk"
+import govukErrorSummary %} {% from "govuk/components/button/macro.njk" import
+govukButton %} {% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    {% if errors %} {{ govukErrorSummary({ titleText: "There is a problem",
+    errorList: checkErrorTemplates(errors) }) }} {% endif %}
 
-{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
-{% from "partials/components.html" import componentList with context %}
+    <h1 class="govuk-heading-l">
+      Enter the number of each type of building that might be included in this
+      development
+    </h1>
 
-{% block content %}
-  <div class="govuk-grid-row">
-    <div class="govuk-grid-column-two-thirds">
-      {% if errors %}
-        {{ govukErrorSummary({
-          titleText: "There is a problem",
-          errorList: checkErrorTemplates(errors)
-        }) }}
-      {% endif %}
+    <p class="govuk-body">
+      Enter numbers in each box, enter a zero if you are not building that type.
+    </p>
 
-      <h1 class="govuk-heading-l">Building Types (Custom Controller Test)</h1>
+    <form method="post" novalidate>
+      <input type="hidden" name="crumb" value="{{ crumb }}" />
 
-      <p class="govuk-body">This page uses BuildingTypesController - a simple custom controller that only overrides the GET handler.</p>
+      <div class="govuk-form-group">
+        <div style="display: flex; align-items: baseline; gap: 1rem">
+          <input
+            class="govuk-input govuk-input--width-5"
+            id="buildingTypes"
+            name="buildingTypes"
+            type="text"
+            inputmode="numeric"
+            value=""
+          />
+          <label class="govuk-label" for="buildingTypes">
+            Dwelling house
+          </label>
+        </div>
+      </div>
 
-      {% include "partials/form.html" %}
-    </div>
+      {{ govukButton({ text: "Continue" }) }}
+    </form>
   </div>
+</div>
 {% endblock %}

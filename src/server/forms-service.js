@@ -85,21 +85,6 @@ const definition = {
       title: '',
       path: ROUTES.BUILDINGS,
       controller: 'BuildingTypesController',
-      components: [
-        {
-          type: 'CheckboxesField',
-          title:
-            'Enter the number of each type of building that might be included in this development',
-          name: FORM_COMPONENT_NAMES.BUILDING_TYPES,
-          shortDescription: 'Building type counts',
-          hint: 'Enter numbers in each box, enter a zero if you are not building that type.',
-          list: FORM_LISTS_IDS.BUILDING_TYPES,
-          options: {
-            required: true
-          },
-          schema: {}
-        }
-      ],
       next: [{ path: ROUTES.WASTE_WATER }]
     },
     {
