@@ -34,7 +34,7 @@ export class BuildingTypesController extends QuestionPageController {
 
   makePostRouteHandler() {
     return async (request, context, h) => {
-      const { payload } = request
+      const { payload, query } = request
       const { state } = context
 
       const total = Object.values(payload)
@@ -64,6 +64,12 @@ export class BuildingTypesController extends QuestionPageController {
       await this.mergeState(request, state, {
         [this.name]: payload
       })
+
+      // Check for returnUrl in query params, otherwise use default next page
+      const returnUrl = query.returnUrl
+      if (returnUrl) {
+        return h.redirect(returnUrl)
+      }
 
       const { next } = this.pageDef
 

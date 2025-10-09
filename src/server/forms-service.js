@@ -41,7 +41,6 @@ const metadata = {
   live: author
 }
 
-
 const definition = {
   name: 'nrf-quote-prototype-01',
   engine: 'V2',

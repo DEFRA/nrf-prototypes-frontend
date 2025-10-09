@@ -29,7 +29,7 @@
               type="text"
               inputmode="numeric"
               value="{{ submittedValues['buildingType-' + loop.index] if submittedValues else '' }}" />
-            <label class="govuk-label building-types-inline-label" for="buildingType-{{ loop.index }}">
+            <label class="govuk-label" for="buildingType-{{ loop.index }}">
               {{ buildingType.text }}
             </label>
           </div>

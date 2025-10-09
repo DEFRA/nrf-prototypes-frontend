@@ -25,7 +25,13 @@
       {% endfor %}
 
       {% if buildingTypes.types.length > 0 %}
-        <h2 class="govuk-heading-m govuk-!-margin-top-6">Building types breakdown</h2>
+        <h2 class="govuk-heading-m govuk-!-margin-top-6">
+          Building types breakdown
+        </h2>
+
+        <p class="govuk-body">
+          <a class="govuk-link" href="{{ buildingTypesChangeUrl }}">Change building types</a>
+        </p>
 
         <p class="govuk-body">
           Total buildings in development: <strong>{{ buildingTypes.total }}</strong>
