@@ -1,40 +1,44 @@
-{% extends baseLayoutPath %} {% from "govuk/components/error-summary/macro.njk"
-import govukErrorSummary %} {% from "govuk/components/button/macro.njk" import
-govukButton %} {% block content %}
+{% extends baseLayoutPath %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% block content %}
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
-    {% if errors %} {{ govukErrorSummary({ titleText: "There is a problem",
-    errorList: checkErrorTemplates(errors) }) }} {% endif %}
+    {% if errors %}
+      {{ govukErrorSummary({
+        titleText: "There is a problem",
+        errorList: checkErrorTemplates(errors)
+      }) }}
+    {% endif %}
 
-    <h1 class="govuk-heading-l">
-      Enter the number of each type of building that might be included in this
-      development
-    </h1>
+    <h1 class="govuk-heading-l">Enter the number of each type of building that might be included in this development</h1>
 
-    <p class="govuk-body">
-      Enter numbers in each box, enter a zero if you are not building that type.
-    </p>
+    <p class="govuk-body">Enter numbers in each box, enter a zero if you are not building that type.</p>
 
     <form method="post" novalidate>
       <input type="hidden" name="crumb" value="{{ crumb }}" />
 
-      <div class="govuk-form-group">
-        <div style="display: flex; align-items: baseline; gap: 1rem">
-          <input
-            class="govuk-input govuk-input--width-5"
-            id="buildingTypes"
-            name="buildingTypes"
-            type="text"
-            inputmode="numeric"
-            value=""
-          />
-          <label class="govuk-label" for="buildingTypes">
-            Dwelling house
-          </label>
+      {% for buildingType in buildingTypes %}
+        <div class="govuk-form-group">
+          <div class="building-types-inline-group">
+            <input
+              class="govuk-input govuk-input--width-5"
+              id="buildingType-{{ loop.index }}"
+              name="buildingType-{{ loop.index }}"
+              type="text"
+              inputmode="numeric"
+              value="" />
+            <label class="govuk-label building-types-inline-label" for="buildingType-{{ loop.index }}">
+              {{ buildingType.text }}
+            </label>
+          </div>
         </div>
-      </div>
+      {% endfor %}
 
-      {{ govukButton({ text: "Continue" }) }}
+      {{ govukButton({
+        text: "Continue"
+      }) }}
     </form>
   </div>
 </div>

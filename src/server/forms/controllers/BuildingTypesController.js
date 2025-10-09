@@ -10,6 +10,13 @@ export class BuildingTypesController extends QuestionPageController {
   makeGetRouteHandler() {
     return (request, context, h) => {
       const viewModel = this.getViewModel(request, context)
+
+      const buildingTypesList = this.model.def.lists.find(
+        (list) => list.name === 'eYJZxu'
+      )
+
+      viewModel.buildingTypes = buildingTypesList?.items || []
+
       return h.view(this.viewName, viewModel)
     }
   }
