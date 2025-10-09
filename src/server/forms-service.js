@@ -147,7 +147,7 @@ const definition = {
     {
       title: 'Check your answers',
       path: ROUTES.SUMMARY,
-      controller: 'SummaryPageController',
+      controller: 'NRFQuoteSummaryController',
       next: []
     }
   ],

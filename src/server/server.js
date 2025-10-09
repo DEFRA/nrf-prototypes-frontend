@@ -19,6 +19,7 @@ import { contentSecurityPolicy } from './common/helpers/content-security-policy.
 import { context } from '../config/nunjucks/context/context.js'
 import services from './forms-service.js'
 import { BuildingTypesController } from './forms/controllers/BuildingTypesController.js'
+import { NRFQuoteSummaryController } from './forms/controllers/NRFQuoteSummaryController.js'
 
 export async function createServer() {
   setupProxy()
@@ -76,7 +77,8 @@ export async function createServer() {
     options: {
       services,
       controllers: {
-        BuildingTypesController
+        BuildingTypesController,
+        NRFQuoteSummaryController
       },
       nunjucks: {
         baseLayoutPath: 'layouts/page.njk',
