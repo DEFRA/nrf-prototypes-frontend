@@ -3,6 +3,10 @@ import { createLogger } from './common/helpers/logging/logger.js'
 import { ROUTES } from './common/constants/routes.js'
 import { FORM_COMPONENT_NAMES } from './common/constants/form-component-names.js'
 import { FORM_METADATA } from './common/constants/form-metadata.js'
+import {
+  FORM_LIST_IDS,
+  FORM_LIST_NAMES
+} from './common/constants/form-lists.js'
 
 const logger = createLogger()
 
@@ -37,10 +41,6 @@ const metadata = {
   live: author
 }
 
-const FORM_LISTS_IDS = {
-  BUILDING_TYPES: 'e8715dc7-1fd6-429f-a9b5-9b2fa7dc533d',
-  WASTE_WATER: '5e0a63ad-8c7f-4dd8-9446-164a4c6567c2'
-}
 
 const definition = {
   name: 'nrf-quote-prototype-01',
@@ -102,7 +102,7 @@ const definition = {
             required: true
           },
           schema: {},
-          list: FORM_LISTS_IDS.WASTE_WATER
+          list: FORM_LIST_IDS.WASTE_WATER
         }
       ],
       next: [{ path: ROUTES.SUDS }]
@@ -155,7 +155,7 @@ const definition = {
   sections: [],
   lists: [
     {
-      name: 'eYJZxu',
+      name: FORM_LIST_NAMES.BUILDING_TYPES,
       title: 'List for question trkPwJ',
       type: 'string',
       items: [
@@ -184,10 +184,10 @@ const definition = {
           value: 'Secure residential institution'
         }
       ],
-      id: FORM_LISTS_IDS.BUILDING_TYPES
+      id: FORM_LIST_IDS.BUILDING_TYPES
     },
     {
-      name: 'ctFVad',
+      name: FORM_LIST_NAMES.WASTE_WATER,
       title: 'List for question nulGtS',
       type: 'string',
       items: [
@@ -200,7 +200,7 @@ const definition = {
           value: 'On-site system'
         }
       ],
-      id: FORM_LISTS_IDS.WASTE_WATER
+      id: FORM_LIST_IDS.WASTE_WATER
     }
   ]
 }

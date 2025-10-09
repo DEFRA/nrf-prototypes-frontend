@@ -1,0 +1,14 @@
+/**
+ * Form list constants
+ * @module constants/form-lists
+ */
+
+export const FORM_LIST_NAMES = {
+  BUILDING_TYPES: 'eYJZxu',
+  WASTE_WATER: 'ctFVad'
+}
+
+export const FORM_LIST_IDS = {
+  BUILDING_TYPES: 'e8715dc7-1fd6-429f-a9b5-9b2fa7dc533d',
+  WASTE_WATER: '5e0a63ad-8c7f-4dd8-9446-164a4c6567c2'
+}
