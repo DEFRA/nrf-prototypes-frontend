@@ -1,6 +1,7 @@
 .building-types-inline-group {
   display: flex;
   align-items: baseline;
+  justify-content: space-between;
   gap: 1rem;
 
   .govuk-label {
