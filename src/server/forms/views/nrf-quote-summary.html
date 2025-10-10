@@ -1,0 +1,70 @@
+{% extends baseLayoutPath %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/table/macro.njk" import govukTable %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      {% if errors %}
+        {{ govukErrorSummary({
+          titleText: "There is a problem",
+          errorList: checkErrorTemplates(errors)
+        }) }}
+      {% endif %}
+
+      <h1 class="govuk-heading-l">
+        Check your answers before submitting your quote request
+      </h1>
+
+      <h2 class="govuk-heading-m">Development details</h2>
+
+      {% for section in checkAnswers %}
+        {{ govukSummaryList(section.summaryList) }}
+      {% endfor %}
+
+      {% if buildingTypes.types.length > 0 %}
+        <h2 class="govuk-heading-m govuk-!-margin-top-6">
+          Building types breakdown
+        </h2>
+
+        <p class="govuk-body">
+          <a class="govuk-link" href="{{ buildingTypesChangeUrl }}">Change building types</a>
+        </p>
+
+        <p class="govuk-body">
+          Total buildings in development: <strong>{{ buildingTypes.total }}</strong>
+        </p>
+
+        {{ govukTable({
+          head: [
+            {
+              text: "Building type"
+            },
+            {
+              text: "Quantity",
+              format: "numeric"
+            }
+          ],
+          rows: buildingTypes.rows
+        }) }}
+      {% endif %}
+
+      <h2 class="govuk-heading-m govuk-!-margin-top-6">Now submit your quote request</h2>
+
+      <p class="govuk-body">
+        By submitting this request you are confirming that, to the best of your knowledge, the details you are providing are correct.
+      </p>
+
+      <form method="post" novalidate>
+        <input type="hidden" name="crumb" value="{{ crumb }}">
+        <input type="hidden" name="action" value="send">
+
+        {{ govukButton({
+          text: "Submit quote request"
+        }) }}
+      </form>
+    </div>
+  </div>
+{% endblock %}
