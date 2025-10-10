@@ -24,6 +24,35 @@
         {{ govukSummaryList(section.summaryList) }}
       {% endfor %}
 
+      {% if boundaryFile %}
+        <h2 class="govuk-heading-m govuk-!-margin-top-6">
+          Boundary file
+        </h2>
+
+        <p class="govuk-body">
+          <a class="govuk-link" href="{{ boundaryFileChangeUrl }}">Change boundary file</a>
+        </p>
+
+        <dl class="govuk-summary-list">
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">
+              File name
+            </dt>
+            <dd class="govuk-summary-list__value">
+              {{ boundaryFile.filename }}
+            </dd>
+          </div>
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">
+              File size
+            </dt>
+            <dd class="govuk-summary-list__value">
+              {{ boundaryFile.size }}
+            </dd>
+          </div>
+        </dl>
+      {% endif %}
+
       {% if buildingTypes.types.length > 0 %}
         <h2 class="govuk-heading-m govuk-!-margin-top-6">
           Building types breakdown
