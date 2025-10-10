@@ -1,92 +1,97 @@
-{% extends baseLayoutPath %}
-{% from "govuk/components/button/macro.njk" import govukButton %}
-{% from "govuk/components/file-upload/macro.njk" import govukFileUpload %}
-{% from "govuk/components/tag/macro.njk" import govukTag %}
+{% extends baseLayoutPath %} {% from "govuk/components/button/macro.njk" import
+govukButton %} {% from "govuk/components/file-upload/macro.njk" import
+govukFileUpload %} {% from "govuk/components/tag/macro.njk" import govukTag %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
-
 {% block content %}
-  <div class="govuk-grid-row">
-    <div class="govuk-grid-column-two-thirds">
-      {% if errors %}
-        {{ govukErrorSummary({
-          titleText: "There is a problem",
-          errorList: checkErrorTemplates(errors)
-        }) }}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    {% if errors %} {{ govukErrorSummary({ titleText: "There is a problem",
+    errorList: checkErrorTemplates(errors) }) }} {% endif %}
+
+    <h1 class="govuk-heading-l">
+      Draw a red line boundary or upload a shapefile
+    </h1>
+
+    <p class="govuk-body">
+      Use the map to draw a red line boundary for where your development might
+      be. If you already have a shapefile you can upload it for your Nature
+      Restoration Fund levy estimate.
+    </p>
+
+    <form method="post">
+      <h2 class="govuk-heading-m">Select a file</h2>
+
+      {{ govukFileUpload({ id: "file", name: "file", label: { text: "Choose
+      file", classes: "govuk-visually-hidden" }, attributes: { accept:
+      ".geojson,.json" } }) }} {{ govukButton({ text: "Upload file", classes:
+      "govuk-button--secondary govuk-!-margin-top-2", attributes: { id:
+      "upload-button" } }) }}
+
+      <h2 class="govuk-heading-m govuk-!-margin-top-6">Uploaded files</h2>
+
+      {% if uploadedFile %}
+      <p class="govuk-body">1 file uploaded</p>
+
+      <dl class="govuk-summary-list">
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">
+            <span class="govuk-!-font-weight-bold"
+              >{{ uploadedFile.filename }}</span
+            >
+            <br />
+            <span class="govuk-body-s govuk-!-font-size-16"
+              >{{ uploadedFile.formattedSize }}</span
+            >
+          </dt>
+          <dd class="govuk-summary-list__value">
+            {{ govukTag({ text: "Uploaded", classes: "govuk-tag--green" }) }}
+          </dd>
+          <dd class="govuk-summary-list__actions">
+            <button
+              type="submit"
+              name="removeFile"
+              value="true"
+              class="govuk-link govuk-link--no-visited-state"
+            >
+              Remove<span class="govuk-visually-hidden">
+                {{ uploadedFile.filename }}</span
+              >
+            </button>
+          </dd>
+        </div>
+      </dl>
+
+      {% if uploadedFile.content %}
+      <div class="govuk-!-margin-top-4">
+        <details class="govuk-details">
+          <summary class="govuk-details__summary">
+            <span class="govuk-details__summary-text">
+              View file contents
+            </span>
+          </summary>
+          <div class="govuk-details__text">
+            <pre
+              style="
+                background-color: #f3f2f1;
+                padding: 1rem;
+                overflow-x: auto;
+                font-size: 14px;
+                max-height: 400px;
+              "
+            ><code>{{ uploadedFile.content }}</code></pre>
+          </div>
+        </details>
+      </div>
+      {% endif %} {% else %}
+      <p class="govuk-body">0 files uploaded</p>
       {% endif %}
 
-      <h1 class="govuk-heading-l">Draw a red line boundary or upload a shapefile</h1>
+      <input type="hidden" name="crumb" value="{{ crumb }}" />
 
-      <p class="govuk-body">
-        Use the map to draw a red line boundary for where your development might be. If you already have a shapefile you can upload it for your Nature Restoration Fund levy estimate.
-      </p>
-
-      <form method="post">
-        <h2 class="govuk-heading-m">Select a file</h2>
-
-        {{ govukFileUpload({
-          id: "file",
-          name: "file",
-          label: {
-            text: "Choose file",
-            classes: "govuk-visually-hidden"
-          },
-          attributes: {
-            accept: ".geojson,.json"
-          }
-        }) }}
-
-        {{ govukButton({
-          text: "Upload file",
-          classes: "govuk-button--secondary govuk-!-margin-top-2",
-          attributes: {
-            id: "upload-button"
-          }
-        }) }}
-
-        <h2 class="govuk-heading-m govuk-!-margin-top-6">Uploaded files</h2>
-
-        {% if uploadedFile %}
-          <p class="govuk-body">1 file uploaded</p>
-
-          <dl class="govuk-summary-list">
-            <div class="govuk-summary-list__row">
-              <dt class="govuk-summary-list__key">
-                <span class="govuk-!-font-weight-bold">{{ uploadedFile.filename }}</span>
-                <br>
-                <span class="govuk-body-s govuk-!-font-size-16">{{ uploadedFile.formattedSize }}</span>
-              </dt>
-              <dd class="govuk-summary-list__value">
-                {{ govukTag({
-                  text: "Uploaded",
-                  classes: "govuk-tag--green"
-                }) }}
-              </dd>
-              <dd class="govuk-summary-list__actions">
-                <button type="submit" name="removeFile" value="true" class="govuk-link govuk-link--no-visited-state">
-                  Remove<span class="govuk-visually-hidden"> {{ uploadedFile.filename }}</span>
-                </button>
-              </dd>
-            </div>
-          </dl>
-        {% else %}
-          <p class="govuk-body">0 files uploaded</p>
-        {% endif %}
-
-        <input type="hidden" name="crumb" value="{{ crumb }}" />
-
-        <div class="govuk-button-group govuk-!-margin-top-6">
-          {{ govukButton({
-            text: "Continue"
-          }) }}
-
-          {{ govukButton({
-            text: "Save and exit",
-            classes: "govuk-button--secondary",
-            name: "saveAndExit",
-            value: "true"
-          }) }}
-        </div>
-      </form>
-    </div>
+      <div class="govuk-button-group govuk-!-margin-top-6">
+        {{ govukButton({ text: "Continue" }) }}
+      </div>
+    </form>
   </div>
+</div>
 {% endblock %}

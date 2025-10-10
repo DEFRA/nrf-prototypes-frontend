@@ -82,7 +82,7 @@ export class BoundaryFileUploadController extends QuestionPageController {
   }
 
   /**
-   * Format file data with human-readable size
+   * Format file data with human-readable size and formatted JSON content
    */
   formatFileData(fileData) {
     if (!fileData) return null
@@ -98,9 +98,31 @@ export class BoundaryFileUploadController extends QuestionPageController {
       formattedSize = `${(sizeInBytes / (1024 * 1024)).toFixed(2)} MB`
     }
 
+    // Format the content as pretty-printed JSON if it exists
+    let formattedContent = null
+    if (fileData.buffer) {
+      try {
+        // Decode base64 buffer
+        const decodedContent = Buffer.from(fileData.buffer, 'base64').toString(
+          'utf-8'
+        )
+        // Parse and re-stringify with indentation
+        const parsed = JSON.parse(decodedContent)
+        formattedContent = JSON.stringify(parsed, null, 2)
+      } catch (error) {
+        // If parsing fails, just use the decoded content as-is
+        formattedContent = Buffer.from(fileData.buffer, 'base64').toString(
+          'utf-8'
+        )
+      }
+    }
+
+    // debugger
+
     return {
       ...fileData,
-      formattedSize
+      formattedSize,
+      content: formattedContent
     }
   }
 
