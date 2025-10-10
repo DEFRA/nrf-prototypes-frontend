@@ -86,8 +86,12 @@ export class BuildingTypesController extends QuestionPageController {
       }
 
       // Save building types to session state (before any redirects)
+      // Merge with existing prototype data to preserve boundary file upload
       await this.mergeState(request, state, {
-        [FORM_METADATA.PROTOTYPE_ID]: payload
+        [FORM_METADATA.PROTOTYPE_ID]: {
+          ...state[FORM_METADATA.PROTOTYPE_ID],
+          ...payload
+        }
       })
 
       // Check if only non-residential development was entered

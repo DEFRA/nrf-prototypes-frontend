@@ -60,8 +60,9 @@ export class BoundaryFileUploadController extends QuestionPageController {
         return h.redirect(decodeURIComponent(returnUrl))
       }
 
-      // Continue to next page
-      return super.makePostRouteHandler()(request, context, h)
+      // Continue to next page - manually navigate since this page has no components
+      const nextPath = `/${FORM_METADATA.SLUG}${ROUTES.BUILDINGS}`
+      return h.redirect(nextPath)
     }
   }
 
