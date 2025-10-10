@@ -5,7 +5,8 @@ import { FORM_COMPONENT_NAMES } from './common/constants/form-component-names.js
 import { FORM_METADATA } from './common/constants/form-metadata.js'
 import {
   FORM_LIST_IDS,
-  FORM_LIST_NAMES
+  FORM_LIST_NAMES,
+  BUILDING_TYPES
 } from './common/constants/form-lists.js'
 
 const logger = createLogger()
@@ -159,28 +160,28 @@ const definition = {
       type: 'string',
       items: [
         {
-          text: 'Dwelling house',
-          value: 'Dwelling house'
+          text: BUILDING_TYPES.DWELLING_HOUSE.text,
+          value: BUILDING_TYPES.DWELLING_HOUSE.id
         },
         {
-          text: 'Hotel',
-          value: 'Hotel'
+          text: BUILDING_TYPES.HOTEL.text,
+          value: BUILDING_TYPES.HOTEL.id
         },
         {
-          text: 'House of multiple occupation (HMO)',
-          value: 'House of multiple occupation (HMO)'
+          text: BUILDING_TYPES.HMO.text,
+          value: BUILDING_TYPES.HMO.id
         },
         {
-          text: 'Non-residential development',
-          value: 'Non-residential development'
+          text: BUILDING_TYPES.NON_RESIDENTIAL.text,
+          value: BUILDING_TYPES.NON_RESIDENTIAL.id
         },
         {
-          text: 'Residential institution',
-          value: 'Residential institution'
+          text: BUILDING_TYPES.RESIDENTIAL_INSTITUTION.text,
+          value: BUILDING_TYPES.RESIDENTIAL_INSTITUTION.id
         },
         {
-          text: 'Secure residential institution',
-          value: 'Secure residential institution'
+          text: BUILDING_TYPES.SECURE_RESIDENTIAL_INSTITUTION.text,
+          value: BUILDING_TYPES.SECURE_RESIDENTIAL_INSTITUTION.id
         }
       ],
       id: FORM_LIST_IDS.BUILDING_TYPES
