@@ -42,7 +42,7 @@ const metadata = {
 }
 
 const definition = {
-  name: 'nrf-quote-prototype-01',
+  name: FORM_METADATA.PROTOTYPE_ID,
   engine: 'V2',
   schema: 2,
   startPage: ROUTES.START,

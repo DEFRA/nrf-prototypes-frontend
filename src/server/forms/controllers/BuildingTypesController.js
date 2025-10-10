@@ -36,7 +36,7 @@ export class BuildingTypesController extends QuestionPageController {
       viewModel.buildingTypes = buildingTypesList?.items || []
 
       // Restore previously entered values from session state
-      const savedValues = state[this.name]
+      const savedValues = state[FORM_METADATA.PROTOTYPE_ID]
       if (savedValues) {
         viewModel.submittedValues = savedValues
       }
@@ -83,7 +83,7 @@ export class BuildingTypesController extends QuestionPageController {
 
       // Save building types to session state
       await this.mergeState(request, state, {
-        [this.name]: payload
+        [FORM_METADATA.PROTOTYPE_ID]: payload
       })
 
       // Support returnUrl for "Change" links from summary page
