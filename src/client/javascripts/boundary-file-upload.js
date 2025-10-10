@@ -48,16 +48,14 @@ export function initBoundaryFileUpload() {
       form.submit()
     } catch (error) {
       console.error('Error uploading file:', error)
-      // eslint-disable-next-line no-undef
-      alert('Error uploading file. Please try again.')
+      window.alert('Error uploading file. Please try again.')
     }
   })
 }
 
 function readFileAsBase64(file) {
   return new Promise((resolve, reject) => {
-    // eslint-disable-next-line no-undef
-    const reader = new FileReader()
+    const reader = new window.FileReader()
 
     reader.onload = () => {
       // Remove data:*/*;base64, prefix

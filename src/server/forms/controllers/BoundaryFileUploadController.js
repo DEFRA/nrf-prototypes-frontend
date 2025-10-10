@@ -55,7 +55,17 @@ export class BoundaryFileUploadController extends QuestionPageController {
             return h.redirect(request.path)
           }
         } catch (error) {
-          // Invalid JSON, ignore
+          // Return to form with error message
+          const viewModel = this.getViewModel(request, context)
+          viewModel.errors = [
+            {
+              path: 'file',
+              name: 'file',
+              href: '#file',
+              text: 'There was a problem uploading your file. Please try again.'
+            }
+          ]
+          return h.view(this.viewName, viewModel)
         }
       }
 
@@ -116,8 +126,6 @@ export class BoundaryFileUploadController extends QuestionPageController {
         )
       }
     }
-
-    // debugger
 
     return {
       ...fileData,
