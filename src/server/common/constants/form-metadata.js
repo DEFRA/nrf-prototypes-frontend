@@ -1,8 +1,3 @@
-/**
- * Form metadata constants
- * @module constants/form-metadata
- */
-
 export const FORM_METADATA = {
   SLUG: 'nrf-quote',
   ID: 'nrf-quote-01',

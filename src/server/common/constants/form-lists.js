@@ -1,11 +1,6 @@
-/**
- * Form list constants
- * @module constants/form-lists
- */
-
 export const FORM_LIST_NAMES = {
-  BUILDING_TYPES: 'eYJZxu',
-  WASTE_WATER: 'ctFVad'
+  BUILDING_TYPES: 'buildingTypes',
+  WASTE_WATER: 'wasteWater'
 }
 
 export const FORM_LIST_IDS = {
