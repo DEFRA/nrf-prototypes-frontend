@@ -17,10 +17,15 @@ export class BoundaryFileUploadController extends QuestionPageController {
       const { state } = context
       const uploadedFile = this.getFileFromState(state)
 
+      // Format file size if file exists
+      const formattedFile = uploadedFile
+        ? this.formatFileData(uploadedFile)
+        : null
+
       const response = await super.makeGetRouteHandler()(request, context, h)
 
       if (response && response.variety === 'view') {
-        response.source.context.uploadedFile = uploadedFile
+        response.source.context.uploadedFile = formattedFile
       }
 
       return response
@@ -71,7 +76,32 @@ export class BoundaryFileUploadController extends QuestionPageController {
    */
   getFileFromState(state) {
     const formData = state[FORM_METADATA.PROTOTYPE_ID]
-    return formData?.[FORM_COMPONENT_NAMES.BOUNDARY_FILE]
+    const fileData = formData?.[FORM_COMPONENT_NAMES.BOUNDARY_FILE]
+
+    return fileData
+  }
+
+  /**
+   * Format file data with human-readable size
+   */
+  formatFileData(fileData) {
+    if (!fileData) return null
+
+    const sizeInBytes = fileData.size || 0
+    let formattedSize
+
+    if (sizeInBytes < 1024) {
+      formattedSize = `${sizeInBytes} bytes`
+    } else if (sizeInBytes < 1024 * 1024) {
+      formattedSize = `${(sizeInBytes / 1024).toFixed(2)} KB`
+    } else {
+      formattedSize = `${(sizeInBytes / (1024 * 1024)).toFixed(2)} MB`
+    }
+
+    return {
+      ...fileData,
+      formattedSize
+    }
   }
 
   /**

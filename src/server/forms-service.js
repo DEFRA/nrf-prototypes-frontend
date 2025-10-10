@@ -78,6 +78,7 @@ const definition = {
     {
       title: '',
       path: ROUTES.WASTE_WATER,
+      controller: 'NRFQuestionPageController',
       components: [
         {
           type: 'RadiosField',
@@ -97,6 +98,7 @@ const definition = {
     {
       title: '',
       path: ROUTES.SUDS,
+      controller: 'NRFQuestionPageController',
       components: [
         {
           type: 'YesNoField',
@@ -116,6 +118,7 @@ const definition = {
     {
       title: '',
       path: ROUTES.EMAIL,
+      controller: 'NRFQuestionPageController',
       components: [
         {
           type: 'EmailAddressField',

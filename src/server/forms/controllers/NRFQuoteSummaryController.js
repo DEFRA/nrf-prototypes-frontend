@@ -86,6 +86,7 @@ export class NRFQuoteSummaryController extends SummaryPageController {
   makeGetRouteHandler() {
     return async (request, context, h) => {
       const { state } = context
+
       const buildingTypes = this.formatBuildingTypes(state)
       const boundaryFile = this.formatBoundaryFile(state)
 
