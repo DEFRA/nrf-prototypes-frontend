@@ -6,6 +6,7 @@
 export const FORM_COMPONENT_NAMES = {
   START: 'start',
   RED_LINE_BOUNDARY: 'redLineBoundary',
+  BOUNDARY_FILE: 'boundaryFile',
   BUILDING_TYPES: 'buildingTypes',
   WASTE_WATER: 'wasteWater',
   SUDS: 'suds',

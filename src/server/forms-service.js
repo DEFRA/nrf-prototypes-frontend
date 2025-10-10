@@ -64,22 +64,9 @@ const definition = {
       next: [{ path: ROUTES.UPLOAD }]
     },
     {
-      title: 'Draw a red line boundary or upload a shapefile (optional)',
+      title: 'Draw a red line boundary or upload a shapefile',
       path: ROUTES.UPLOAD,
-      components: [
-        {
-          type: 'FileUploadField',
-          title: 'Draw a red line boundary or upload a shapefile (optional)',
-          name: FORM_COMPONENT_NAMES.RED_LINE_BOUNDARY,
-          shortDescription: 'Red line boundary',
-          hint: 'Use the map to draw a red line boundary for where your development might be. If you already have a shapefile you can upload it for your Nature Restoration Fund levy estimate.',
-          options: {
-            required: false,
-            accept: '.shp, .kml, .geojson, .json'
-          },
-          schema: {}
-        }
-      ],
+      controller: 'BoundaryFileUploadController',
       next: [{ path: ROUTES.BUILDINGS }]
     },
     {

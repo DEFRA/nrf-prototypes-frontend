@@ -20,6 +20,7 @@ import { context } from '../config/nunjucks/context/context.js'
 import services from './forms-service.js'
 import { BuildingTypesController } from './forms/controllers/BuildingTypesController.js'
 import { NRFQuoteSummaryController } from './forms/controllers/NRFQuoteSummaryController.js'
+import { BoundaryFileUploadController } from './forms/controllers/BoundaryFileUploadController.js'
 
 export async function createServer() {
   setupProxy()
@@ -78,7 +79,8 @@ export async function createServer() {
       services,
       controllers: {
         BuildingTypesController,
-        NRFQuoteSummaryController
+        NRFQuoteSummaryController,
+        BoundaryFileUploadController
       },
       nunjucks: {
         baseLayoutPath: 'layouts/page.njk',
