@@ -3,10 +3,74 @@ import { FORM_METADATA } from '../../common/constants/form-metadata.js'
 import { FORM_COMPONENT_NAMES } from '../../common/constants/form-component-names.js'
 import { ROUTES } from '../../common/constants/routes.js'
 
+const ALLOWED_FILE_EXTENSIONS = ['.geojson', '.json', '.kml']
+const ALLOWED_CONTENT_TYPES = [
+  'application/json',
+  'application/geo+json',
+  'application/vnd.google-earth.kml+xml',
+  'text/plain'
+]
+const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024 // 10MB
+
 export class BoundaryFileUploadController extends QuestionPageController {
   constructor(model, pageDef) {
     super(model, pageDef)
     this.viewName = 'boundary-file-upload'
+  }
+
+  /**
+   * Validates file data according to supported types and constraints
+   * @param {Object} fileData - The file data to validate
+   * @returns {Object|null} Error object if validation fails, null if valid
+   */
+  validateFile(fileData) {
+    // Validate required fields
+    if (!fileData.filename || !fileData.size || !fileData.contentType) {
+      return {
+        text: 'File is missing required information (filename, size, or content type)'
+      }
+    }
+
+    // Validate buffer exists
+    if (!fileData.buffer) {
+      return {
+        text: 'File content is missing'
+      }
+    }
+
+    // Validate file extension
+    const filename = fileData.filename.toLowerCase()
+    const hasValidExtension = ALLOWED_FILE_EXTENSIONS.some((ext) =>
+      filename.endsWith(ext)
+    )
+
+    if (!hasValidExtension) {
+      return {
+        text: `File type not supported. Please upload a file with one of these extensions: ${ALLOWED_FILE_EXTENSIONS.join(', ')}`
+      }
+    }
+
+    // Validate content type
+    const contentType = fileData.contentType.toLowerCase()
+    const hasValidContentType = ALLOWED_CONTENT_TYPES.some((type) =>
+      contentType.includes(type.toLowerCase())
+    )
+
+    if (!hasValidContentType) {
+      return {
+        text: `File content type '${fileData.contentType}' is not supported. Expected one of: ${ALLOWED_CONTENT_TYPES.join(', ')}`
+      }
+    }
+
+    // Validate file size
+    if (fileData.size > MAX_FILE_SIZE_BYTES) {
+      const maxSizeMB = (MAX_FILE_SIZE_BYTES / (1024 * 1024)).toFixed(0)
+      return {
+        text: `File size exceeds maximum allowed size of ${maxSizeMB}MB`
+      }
+    }
+
+    return null // Valid
   }
 
   /**
@@ -50,6 +114,23 @@ export class BoundaryFileUploadController extends QuestionPageController {
       if (payload.fileData) {
         try {
           const fileData = JSON.parse(payload.fileData)
+
+          // Validate file data
+          const validationError = this.validateFile(fileData)
+          if (validationError) {
+            const viewModel = this.getViewModel(request, context)
+            viewModel.errors = [
+              {
+                path: 'file',
+                name: 'file',
+                href: '#file',
+                text: validationError.text
+              }
+            ]
+            return h.view(this.viewName, viewModel)
+          }
+
+          // Save valid file
           if (fileData && fileData.filename) {
             await this.saveFile(request, state, fileData)
             return h.redirect(request.path)
