@@ -70,7 +70,7 @@ govukFileUpload %} {% from "govuk/components/tag/macro.njk" import govukTag %}
             </span>
           </summary>
           <div class="govuk-details__text">
-            <pre class="file-content-preview"><code>{{ uploadedFile.content }}</code></pre>
+            <pre class="file-content-preview"><code>{{ uploadedFile.content | e }}</code></pre>
           </div>
         </details>
       </div>
