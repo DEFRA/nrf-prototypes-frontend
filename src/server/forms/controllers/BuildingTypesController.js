@@ -104,6 +104,18 @@ export class BuildingTypesController extends QuestionPageController {
         const value = payload[fieldName]
 
         if (validFieldNames.has(fieldName)) {
+          // Check for decimal numbers (user mistake)
+          if (value && value.toString().includes('.')) {
+            errors.push({
+              path: fieldName,
+              name: fieldName,
+              href: `#${fieldName}`,
+              text: `${item.text}: Please enter a whole number (no decimals)`
+            })
+            validatedPayload[fieldName] = value
+            return
+          }
+
           const parsedValue = parseInt(value, 10)
 
           // Check if value is a valid number
