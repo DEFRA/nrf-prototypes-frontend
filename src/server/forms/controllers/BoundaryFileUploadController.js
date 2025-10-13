@@ -136,23 +136,33 @@ export class BoundaryFileUploadController extends QuestionPageController {
 
   /**
    * Save file data to state
+   * Preserves existing prototype data like building types
    */
   async saveFile(request, state, fileData) {
+    const existingData = state[FORM_METADATA.PROTOTYPE_ID] || {}
+    const mergedData = {
+      ...existingData,
+      [FORM_COMPONENT_NAMES.BOUNDARY_FILE]: fileData
+    }
+
     await this.mergeState(request, state, {
-      [FORM_METADATA.PROTOTYPE_ID]: {
-        [FORM_COMPONENT_NAMES.BOUNDARY_FILE]: fileData
-      }
+      [FORM_METADATA.PROTOTYPE_ID]: mergedData
     })
   }
 
   /**
    * Remove file from state
+   * Preserves existing prototype data like building types
    */
   async removeFile(request, state) {
+    const existingData = state[FORM_METADATA.PROTOTYPE_ID] || {}
+    const mergedData = {
+      ...existingData,
+      [FORM_COMPONENT_NAMES.BOUNDARY_FILE]: null
+    }
+
     await this.mergeState(request, state, {
-      [FORM_METADATA.PROTOTYPE_ID]: {
-        [FORM_COMPONENT_NAMES.BOUNDARY_FILE]: null
-      }
+      [FORM_METADATA.PROTOTYPE_ID]: mergedData
     })
   }
 }

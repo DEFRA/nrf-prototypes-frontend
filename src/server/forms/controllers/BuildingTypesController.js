@@ -7,6 +7,9 @@ import {
 } from '../../common/constants/form-lists.js'
 import { ROUTES } from '../../common/constants/routes.js'
 
+// Field name prefix for building type inputs
+const BUILDING_TYPE_FIELD_PREFIX = 'buildingType-'
+
 /**
  * Custom controller for the building types page
  * Displays a custom form with inline input/label layout for entering building quantities
@@ -15,6 +18,22 @@ export class BuildingTypesController extends QuestionPageController {
   constructor(model, pageDef) {
     super(model, pageDef)
     this.viewName = 'building-types'
+  }
+
+  /**
+   * Helper to generate field name for a building type by index
+   * @param {number} index - 1-based index matching template loop.index
+   */
+  getBuildingTypeFieldName(index) {
+    return `${BUILDING_TYPE_FIELD_PREFIX}${index}`
+  }
+
+  /**
+   * Helper to check if a field name is a building type field
+   * @param {string} fieldName
+   */
+  isBuildingTypeField(fieldName) {
+    return fieldName.startsWith(BUILDING_TYPE_FIELD_PREFIX)
   }
 
   /**
@@ -39,10 +58,14 @@ export class BuildingTypesController extends QuestionPageController {
       const buildingTypesList = this.getBuildingTypesList()
       viewModel.buildingTypes = buildingTypesList?.items || []
 
-      // Restore previously entered values from session state
-      const savedValues = state[FORM_METADATA.PROTOTYPE_ID]
-      if (savedValues) {
-        viewModel.submittedValues = savedValues
+      // Restore previously entered building type values from session state
+      const savedValues = state[FORM_METADATA.PROTOTYPE_ID] || {}
+
+      viewModel.submittedValues = {}
+      const buildingTypes = buildingTypesList?.items || []
+      for (let i = 0; i < buildingTypes.length; i++) {
+        const fieldName = this.getBuildingTypeFieldName(i + 1)
+        viewModel.submittedValues[fieldName] = savedValues[fieldName] ?? 0
       }
 
       return h.view(this.viewName, viewModel)
@@ -59,8 +82,24 @@ export class BuildingTypesController extends QuestionPageController {
       const { payload, query } = request
       const { state } = context
 
+      // Get the list of valid building type fields
+      const buildingTypesList = this.getBuildingTypesList()
+      const validFieldNames = new Set()
+      for (let i = 0; i < (buildingTypesList?.items.length || 0); i++) {
+        validFieldNames.add(this.getBuildingTypeFieldName(i + 1))
+      }
+
+      // Filter payload to only include valid building type fields
+      // This protects against malicious requests with spoofed field names
+      const validatedPayload = {}
+      Object.keys(payload).forEach((key) => {
+        if (this.isBuildingTypeField(key) && validFieldNames.has(key)) {
+          validatedPayload[key] = payload[key]
+        }
+      })
+
       // Calculate total number of buildings across all types
-      const total = Object.values(payload)
+      const total = Object.values(validatedPayload)
         .filter((value) => typeof value === 'string' && value !== '')
         .map((value) => parseInt(value, 10))
         .filter((value) => !isNaN(value))
@@ -70,14 +109,13 @@ export class BuildingTypesController extends QuestionPageController {
       if (total === 0) {
         const viewModel = this.getViewModel(request, context)
 
-        const buildingTypesList = this.getBuildingTypesList()
         viewModel.buildingTypes = buildingTypesList?.items || []
-        viewModel.submittedValues = payload
+        viewModel.submittedValues = validatedPayload
         viewModel.errors = [
           {
             path: FORM_COMPONENT_NAMES.BUILDING_TYPES,
             name: FORM_COMPONENT_NAMES.BUILDING_TYPES,
-            href: '#buildingType-1',
+            href: `#${this.getBuildingTypeFieldName(1)}`,
             text: 'Enter at least one building with a value of 1 or more'
           }
         ]
@@ -90,7 +128,7 @@ export class BuildingTypesController extends QuestionPageController {
       const existingData = state[FORM_METADATA.PROTOTYPE_ID]
       const mergedData = {
         ...existingData,
-        ...payload
+        ...validatedPayload
       }
 
       await this.mergeState(request, state, {
@@ -98,15 +136,13 @@ export class BuildingTypesController extends QuestionPageController {
       })
 
       // Check if only non-residential development was entered
-      const buildingTypesList = this.getBuildingTypesList()
-
       let hasNonResidential = false
       let hasResidentialTypes = false
 
       // Check each building type
       buildingTypesList?.items.forEach((item, index) => {
-        const fieldName = `buildingType-${index + 1}`
-        const quantity = parseInt(payload[fieldName], 10) || 0
+        const fieldName = this.getBuildingTypeFieldName(index + 1)
+        const quantity = parseInt(validatedPayload[fieldName], 10) || 0
 
         if (quantity > 0) {
           if (item.value === BUILDING_TYPES.NON_RESIDENTIAL.id) {
