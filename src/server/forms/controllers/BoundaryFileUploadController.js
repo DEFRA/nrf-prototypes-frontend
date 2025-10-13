@@ -26,7 +26,6 @@ export class BoundaryFileUploadController extends QuestionPageController {
    * @returns {Object|null} Error object if validation fails, null if valid
    */
   validateFile(fileData) {
-    // Validate required fields
     if (!fileData.filename || !fileData.size || !fileData.contentType) {
       return {
         text: 'File is missing required information (filename, size, or content type)'
@@ -79,7 +78,6 @@ export class BoundaryFileUploadController extends QuestionPageController {
       const { state } = context
       const uploadedFile = this.getFileFromState(state)
 
-      // Format file size if file exists
       const formattedFile = uploadedFile
         ? this.formatFileData(uploadedFile)
         : null
@@ -102,18 +100,15 @@ export class BoundaryFileUploadController extends QuestionPageController {
       const { state } = context
       const { payload } = request
 
-      // Handle file removal
       if (payload.removeFile) {
         await this.removeFile(request, state)
         return h.redirect(request.path)
       }
 
-      // Handle file upload (base64 encoded from client)
       if (payload.fileData) {
         try {
           const fileData = JSON.parse(payload.fileData)
 
-          // Validate file data
           const validationError = this.validateFile(fileData)
           if (validationError) {
             const viewModel = this.getViewModel(request, context)
@@ -128,13 +123,11 @@ export class BoundaryFileUploadController extends QuestionPageController {
             return h.view(this.viewName, viewModel)
           }
 
-          // Save valid file
           if (fileData && fileData.filename) {
             await this.saveFile(request, state, fileData)
             return h.redirect(request.path)
           }
         } catch (error) {
-          // Return to form with error message
           const viewModel = this.getViewModel(request, context)
           viewModel.errors = [
             {
@@ -148,13 +141,11 @@ export class BoundaryFileUploadController extends QuestionPageController {
         }
       }
 
-      // Handle returnUrl if present (only allow relative paths for security)
       const returnUrl = request.query.returnUrl
       if (returnUrl && isPathRelative(returnUrl)) {
         return h.redirect(decodeURIComponent(returnUrl))
       }
 
-      // Continue to next page - manually navigate since this page has no components
       const nextPath = `/${FORM_METADATA.SLUG}${ROUTES.BUILDINGS}`
       return h.redirect(nextPath)
     }
@@ -178,19 +169,15 @@ export class BoundaryFileUploadController extends QuestionPageController {
 
     const formattedSize = formatFileSize(fileData.size || 0)
 
-    // Format the content as pretty-printed JSON if it exists
     let formattedContent = null
     if (fileData.buffer) {
       try {
-        // Decode base64 buffer
         const decodedContent = Buffer.from(fileData.buffer, 'base64').toString(
           'utf-8'
         )
-        // Parse and re-stringify with indentation
         const parsed = JSON.parse(decodedContent)
         formattedContent = JSON.stringify(parsed, null, 2)
       } catch (error) {
-        // If parsing fails, just use the decoded content as-is
         formattedContent = Buffer.from(fileData.buffer, 'base64').toString(
           'utf-8'
         )

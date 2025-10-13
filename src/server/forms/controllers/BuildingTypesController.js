@@ -87,15 +87,12 @@ export class BuildingTypesController extends QuestionPageController {
       const { payload, query } = request
       const { state } = context
 
-      // Get the list of valid building type fields
       const buildingTypesList = this.getBuildingTypesList()
       const validFieldNames = new Set()
       for (let i = 0; i < (buildingTypesList?.items.length || 0); i++) {
         validFieldNames.add(this.getBuildingTypeFieldName(i + 1))
       }
 
-      // Validate and filter payload to only include valid building type fields
-      // This protects against malicious requests with spoofed field names
       const validatedPayload = {}
       const errors = []
 
@@ -104,7 +101,6 @@ export class BuildingTypesController extends QuestionPageController {
         const value = payload[fieldName]
 
         if (validFieldNames.has(fieldName)) {
-          // Check for decimal numbers (user mistake)
           if (value && value.toString().includes('.')) {
             errors.push({
               path: fieldName,
@@ -118,7 +114,6 @@ export class BuildingTypesController extends QuestionPageController {
 
           const parsedValue = parseInt(value, 10)
 
-          // Check if value is a valid number
           if (isNaN(parsedValue)) {
             errors.push({
               path: fieldName,
@@ -130,7 +125,6 @@ export class BuildingTypesController extends QuestionPageController {
             return
           }
 
-          // Check if value is negative
           if (parsedValue < MIN_QUANTITY) {
             errors.push({
               path: fieldName,
@@ -142,7 +136,6 @@ export class BuildingTypesController extends QuestionPageController {
             return
           }
 
-          // Check if value exceeds maximum
           if (parsedValue > MAX_QUANTITY) {
             errors.push({
               path: fieldName,
@@ -158,7 +151,6 @@ export class BuildingTypesController extends QuestionPageController {
         }
       })
 
-      // If there are validation errors, return to form with errors
       if (errors.length > 0) {
         const viewModel = this.getViewModel(request, context)
 
@@ -169,14 +161,12 @@ export class BuildingTypesController extends QuestionPageController {
         return h.view(this.viewName, viewModel)
       }
 
-      // Calculate total number of buildings across all types
       const total = Object.values(validatedPayload)
         .filter((value) => typeof value === 'string' && value !== '')
         .map((value) => parseInt(value, 10))
         .filter((value) => !isNaN(value))
         .reduce((sum, value) => sum + value, 0)
 
-      // Validation: require at least one building
       if (total === 0) {
         const viewModel = this.getViewModel(request, context)
 
@@ -206,11 +196,9 @@ export class BuildingTypesController extends QuestionPageController {
         [FORM_METADATA.PROTOTYPE_ID]: mergedData
       })
 
-      // Check if only non-residential development was entered
       let hasNonResidential = false
       let hasResidentialTypes = false
 
-      // Check each building type
       buildingTypesList?.items.forEach((item, index) => {
         const fieldName = this.getBuildingTypeFieldName(index + 1)
         const quantity = parseInt(validatedPayload[fieldName], 10) || 0
@@ -231,7 +219,6 @@ export class BuildingTypesController extends QuestionPageController {
         )
       }
 
-      // Support returnUrl for "Change" links from summary page (only allow relative paths for security)
       const returnUrl = query.returnUrl
       if (returnUrl && isPathRelative(returnUrl)) {
         return h.redirect(returnUrl)
