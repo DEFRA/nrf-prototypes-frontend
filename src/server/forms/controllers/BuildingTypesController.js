@@ -1,4 +1,5 @@
 import { QuestionPageController } from '@defra/forms-engine-plugin/controllers/QuestionPageController.js'
+import { isPathRelative } from '@defra/forms-engine-plugin/engine/helpers.js'
 import { FORM_METADATA } from '../../common/constants/form-metadata.js'
 import { FORM_COMPONENT_NAMES } from '../../common/constants/form-component-names.js'
 import {
@@ -218,9 +219,9 @@ export class BuildingTypesController extends QuestionPageController {
         )
       }
 
-      // Support returnUrl for "Change" links from summary page
+      // Support returnUrl for "Change" links from summary page (only allow relative paths for security)
       const returnUrl = query.returnUrl
-      if (returnUrl) {
+      if (returnUrl && isPathRelative(returnUrl)) {
         return h.redirect(returnUrl)
       }
 

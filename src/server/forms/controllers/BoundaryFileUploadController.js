@@ -1,4 +1,5 @@
 import { QuestionPageController } from '@defra/forms-engine-plugin/controllers/QuestionPageController.js'
+import { isPathRelative } from '@defra/forms-engine-plugin/engine/helpers.js'
 import { FORM_METADATA } from '../../common/constants/form-metadata.js'
 import { FORM_COMPONENT_NAMES } from '../../common/constants/form-component-names.js'
 import { ROUTES } from '../../common/constants/routes.js'
@@ -31,14 +32,12 @@ export class BoundaryFileUploadController extends QuestionPageController {
       }
     }
 
-    // Validate buffer exists
     if (!fileData.buffer) {
       return {
         text: 'File content is missing'
       }
     }
 
-    // Validate file extension
     const filename = fileData.filename.toLowerCase()
     const hasValidExtension = ALLOWED_FILE_EXTENSIONS.some((ext) =>
       filename.endsWith(ext)
@@ -50,7 +49,6 @@ export class BoundaryFileUploadController extends QuestionPageController {
       }
     }
 
-    // Validate content type
     const contentType = fileData.contentType.toLowerCase()
     const hasValidContentType = ALLOWED_CONTENT_TYPES.some((type) =>
       contentType.includes(type.toLowerCase())
@@ -62,7 +60,6 @@ export class BoundaryFileUploadController extends QuestionPageController {
       }
     }
 
-    // Validate file size
     if (fileData.size > MAX_FILE_SIZE_BYTES) {
       const maxSizeMB = (MAX_FILE_SIZE_BYTES / (1024 * 1024)).toFixed(0)
       return {
@@ -70,7 +67,7 @@ export class BoundaryFileUploadController extends QuestionPageController {
       }
     }
 
-    return null // Valid
+    return null // is valid!
   }
 
   /**
@@ -150,9 +147,9 @@ export class BoundaryFileUploadController extends QuestionPageController {
         }
       }
 
-      // Handle returnUrl if present
+      // Handle returnUrl if present (only allow relative paths for security)
       const returnUrl = request.query.returnUrl
-      if (returnUrl) {
+      if (returnUrl && isPathRelative(returnUrl)) {
         return h.redirect(decodeURIComponent(returnUrl))
       }
 
