@@ -1,5 +1,6 @@
 import { QuestionPageController } from '@defra/forms-engine-plugin/controllers/QuestionPageController.js'
 import { isPathRelative } from '@defra/forms-engine-plugin/engine/helpers.js'
+import { formatFileSize } from '../../common/helpers/format-utils.js'
 import { FORM_METADATA } from '../../common/constants/form-metadata.js'
 import { FORM_COMPONENT_NAMES } from '../../common/constants/form-component-names.js'
 import { ROUTES } from '../../common/constants/routes.js'
@@ -175,16 +176,7 @@ export class BoundaryFileUploadController extends QuestionPageController {
   formatFileData(fileData) {
     if (!fileData) return null
 
-    const sizeInBytes = fileData.size || 0
-    let formattedSize
-
-    if (sizeInBytes < 1024) {
-      formattedSize = `${sizeInBytes} bytes`
-    } else if (sizeInBytes < 1024 * 1024) {
-      formattedSize = `${(sizeInBytes / 1024).toFixed(2)} KB`
-    } else {
-      formattedSize = `${(sizeInBytes / (1024 * 1024)).toFixed(2)} MB`
-    }
+    const formattedSize = formatFileSize(fileData.size || 0)
 
     // Format the content as pretty-printed JSON if it exists
     let formattedContent = null

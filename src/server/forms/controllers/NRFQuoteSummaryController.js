@@ -1,4 +1,5 @@
 import { SummaryPageController } from '@defra/forms-engine-plugin/controllers/SummaryPageController.js'
+import { formatFileSize } from '../../common/helpers/format-utils.js'
 import { FORM_LIST_NAMES } from '../../common/constants/form-lists.js'
 import { ROUTES } from '../../common/constants/routes.js'
 import { FORM_METADATA } from '../../common/constants/form-metadata.js'
@@ -69,20 +70,9 @@ export class NRFQuoteSummaryController extends SummaryPageController {
       return null
     }
 
-    // Format file size in bytes/KB/MB
-    const sizeInBytes = fileData.size || 0
-    let formattedSize
-    if (sizeInBytes < 1024) {
-      formattedSize = `${sizeInBytes} bytes`
-    } else if (sizeInBytes < 1024 * 1024) {
-      formattedSize = `${(sizeInBytes / 1024).toFixed(2)} KB`
-    } else {
-      formattedSize = `${(sizeInBytes / (1024 * 1024)).toFixed(2)} MB`
-    }
-
     return {
       filename: fileData.filename,
-      size: formattedSize,
+      size: formatFileSize(fileData.size || 0),
       uploadedAt: fileData.uploadedAt
     }
   }
