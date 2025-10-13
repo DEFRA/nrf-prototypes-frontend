@@ -154,12 +154,14 @@ docker build --tag nrf-frontend-starter .                       # Production ima
 **IMPORTANT**: Forms-engine templates **MUST use `.html` extension**, NOT `.njk`.
 
 **Why:**
+
 - The `@defra/forms-engine-plugin` registers its own `@hapi/vision` configuration
 - This registration happens AFTER the main app's nunjucks config
 - The forms-engine only registers the `html` engine, which overwrites the app's `njk` engine
 - Custom form views in `src/server/forms/views/` must be `.html` files
 
 **Example:**
+
 ```
 ✅ src/server/forms/views/nrf-quote-summary.html
 ❌ src/server/forms/views/nrf-quote-summary.njk
@@ -168,6 +170,7 @@ docker build --tag nrf-frontend-starter .                       # Production ima
 **Note**: Regular route views (home, about, error) can still use `.njk` because they're rendered before the forms-engine plugin overwrites the Vision config.
 
 **Technical Details:**
+
 - Forms-engine Vision registration: `node_modules/@defra/forms-engine-plugin/src/server/plugins/engine/vision.ts:38`
 - Only registers: `engines: { html: { ... } }`
 - Server registration order in `src/server/server.js`:

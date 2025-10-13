@@ -37,20 +37,24 @@ export class NRFQuoteSummaryController extends SummaryPageController {
       const fieldName = `buildingType-${index + 1}`
       const quantity = parseInt(buildingTypesData[fieldName], 10) || 0
 
-      formattedTypes.push({
-        type: item.text,
-        quantity,
-        value: item.value
-      })
-      rows.push([
-        {
-          text: item.text
-        },
-        {
-          text: quantity.toString(),
-          format: 'numeric'
-        }
-      ])
+      // Only include building types with quantity > 0
+      if (quantity > 0) {
+        formattedTypes.push({
+          type: item.text,
+          quantity,
+          value: item.value
+        })
+        rows.push([
+          {
+            text: item.text
+          },
+          {
+            text: quantity.toString(),
+            format: 'numeric'
+          }
+        ])
+      }
+
       totalBuildings += quantity
     })
 

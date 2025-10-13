@@ -10,6 +10,10 @@ import { ROUTES } from '../../common/constants/routes.js'
 // Field name prefix for building type inputs
 const BUILDING_TYPE_FIELD_PREFIX = 'buildingType-'
 
+// Validation constants
+const MIN_QUANTITY = 0
+const MAX_QUANTITY = 5000
+
 /**
  * Custom controller for the building types page
  * Displays a custom form with inline input/label layout for entering building quantities
@@ -89,14 +93,68 @@ export class BuildingTypesController extends QuestionPageController {
         validFieldNames.add(this.getBuildingTypeFieldName(i + 1))
       }
 
-      // Filter payload to only include valid building type fields
+      // Validate and filter payload to only include valid building type fields
       // This protects against malicious requests with spoofed field names
       const validatedPayload = {}
-      Object.keys(payload).forEach((key) => {
-        if (this.isBuildingTypeField(key) && validFieldNames.has(key)) {
-          validatedPayload[key] = payload[key]
+      const errors = []
+
+      buildingTypesList?.items.forEach((item, index) => {
+        const fieldName = this.getBuildingTypeFieldName(index + 1)
+        const value = payload[fieldName]
+
+        if (validFieldNames.has(fieldName)) {
+          const parsedValue = parseInt(value, 10)
+
+          // Check if value is a valid number
+          if (isNaN(parsedValue)) {
+            errors.push({
+              path: fieldName,
+              name: fieldName,
+              href: `#${fieldName}`,
+              text: `${item.text}: Please enter a valid number`
+            })
+            validatedPayload[fieldName] = value
+            return
+          }
+
+          // Check if value is negative
+          if (parsedValue < MIN_QUANTITY) {
+            errors.push({
+              path: fieldName,
+              name: fieldName,
+              href: `#${fieldName}`,
+              text: `${item.text}: Value cannot be negative`
+            })
+            validatedPayload[fieldName] = value
+            return
+          }
+
+          // Check if value exceeds maximum
+          if (parsedValue > MAX_QUANTITY) {
+            errors.push({
+              path: fieldName,
+              name: fieldName,
+              href: `#${fieldName}`,
+              text: `${item.text}: Value cannot exceed ${MAX_QUANTITY.toLocaleString()}`
+            })
+            validatedPayload[fieldName] = value
+            return
+          }
+
+          validatedPayload[fieldName] = value
         }
       })
+
+      // If there are validation errors, return to form with errors
+      if (errors.length > 0) {
+        const viewModel = this.getViewModel(request, context)
+
+        viewModel.buildingTypes = buildingTypesList?.items || []
+        viewModel.submittedValues = validatedPayload
+        viewModel.errors = errors
+
+        return h.view(this.viewName, viewModel)
+      }
 
       // Calculate total number of buildings across all types
       const total = Object.values(validatedPayload)
