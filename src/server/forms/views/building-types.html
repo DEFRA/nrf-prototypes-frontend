@@ -1,0 +1,41 @@
+{% extends baseLayoutPath %} {% from "govuk/components/error-summary/macro.njk"
+import govukErrorSummary %} {% from "govuk/components/button/macro.njk" import
+govukButton %} {% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    {% if errors %} {{ govukErrorSummary({ titleText: "There is a problem",
+    errorList: checkErrorTemplates(errors) }) }} {% endif %}
+
+    <h1 class="govuk-heading-l">
+      Enter the number of each type of building that might be included in this
+      development
+    </h1>
+
+    <p class="govuk-body">
+      Enter numbers in each box, enter a zero if you are not building that type.
+    </p>
+
+    <form method="post" novalidate>
+      <input type="hidden" name="crumb" value="{{ crumb }}" />
+
+      {% for buildingType in buildingTypes %}
+      <div class="govuk-form-group">
+        <div class="building-types-inline-group">
+          <label class="govuk-label" for="buildingType-{{ loop.index }}">
+            {{ buildingType.text }}
+          </label>
+          <input
+            class="govuk-input govuk-input--width-5"
+            id="buildingType-{{ loop.index }}"
+            name="buildingType-{{ loop.index }}"
+            type="text"
+            inputmode="numeric"
+            value="{{ submittedValues['buildingType-' + loop.index] if submittedValues else '' }}"
+          />
+        </div>
+      </div>
+      {% endfor %} {{ govukButton({ text: "Continue" }) }}
+    </form>
+  </div>
+</div>
+{% endblock %}

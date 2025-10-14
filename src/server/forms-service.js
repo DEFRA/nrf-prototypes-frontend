@@ -2,6 +2,12 @@ import Boom from '@hapi/boom'
 import { createLogger } from './common/helpers/logging/logger.js'
 import { ROUTES } from './common/constants/routes.js'
 import { FORM_COMPONENT_NAMES } from './common/constants/form-component-names.js'
+import { FORM_METADATA } from './common/constants/form-metadata.js'
+import {
+  FORM_LIST_IDS,
+  FORM_LIST_NAMES,
+  BUILDING_TYPES
+} from './common/constants/form-lists.js'
 
 const logger = createLogger()
 
@@ -24,8 +30,8 @@ function generateReferenceNumber() {
 }
 
 const metadata = {
-  id: 'nrf-quote-01',
-  slug: 'nrf-quote',
+  id: FORM_METADATA.ID,
+  slug: FORM_METADATA.SLUG,
   title: 'Nature Restoration Fund Quote',
   organisation: 'Defra',
   teamName: 'NRF Team',
@@ -36,13 +42,8 @@ const metadata = {
   live: author
 }
 
-const FORM_LISTS_IDS = {
-  BUILDING_TYPES: 'e8715dc7-1fd6-429f-a9b5-9b2fa7dc533d',
-  WASTE_WATER: '5e0a63ad-8c7f-4dd8-9446-164a4c6567c2'
-}
-
 const definition = {
-  name: 'nrf-quote-prototype-01',
+  name: FORM_METADATA.PROTOTYPE_ID,
   engine: 'V2',
   schema: 2,
   startPage: ROUTES.START,
@@ -84,21 +85,7 @@ const definition = {
     {
       title: '',
       path: ROUTES.BUILDINGS,
-      components: [
-        {
-          type: 'CheckboxesField',
-          title:
-            'Enter the number of each type of building that might be included in this development',
-          name: FORM_COMPONENT_NAMES.BUILDING_TYPES,
-          shortDescription: 'Building type counts',
-          hint: 'Enter numbers in each box, enter a zero if you are not building that type.',
-          list: FORM_LISTS_IDS.BUILDING_TYPES,
-          options: {
-            required: true
-          },
-          schema: {}
-        }
-      ],
+      controller: 'BuildingTypesController',
       next: [{ path: ROUTES.WASTE_WATER }]
     },
     {
@@ -115,7 +102,7 @@ const definition = {
             required: true
           },
           schema: {},
-          list: FORM_LISTS_IDS.WASTE_WATER
+          list: FORM_LIST_IDS.WASTE_WATER
         }
       ],
       next: [{ path: ROUTES.SUDS }]
@@ -160,7 +147,7 @@ const definition = {
     {
       title: 'Check your answers',
       path: ROUTES.SUMMARY,
-      controller: 'SummaryPageController',
+      controller: 'NRFQuoteSummaryController',
       next: []
     }
   ],
@@ -168,39 +155,39 @@ const definition = {
   sections: [],
   lists: [
     {
-      name: 'eYJZxu',
+      name: FORM_LIST_NAMES.BUILDING_TYPES,
       title: 'List for question trkPwJ',
       type: 'string',
       items: [
         {
-          text: 'Dwelling house',
-          value: 'Dwelling house'
+          text: BUILDING_TYPES.DWELLING_HOUSE.text,
+          value: BUILDING_TYPES.DWELLING_HOUSE.id
         },
         {
-          text: 'Hotel',
-          value: 'Hotel'
+          text: BUILDING_TYPES.HOTEL.text,
+          value: BUILDING_TYPES.HOTEL.id
         },
         {
-          text: 'House of multiple occupation (HMO)',
-          value: 'House of multiple occupation (HMO)'
+          text: BUILDING_TYPES.HMO.text,
+          value: BUILDING_TYPES.HMO.id
         },
         {
-          text: 'Non-residential development',
-          value: 'Non-residential development'
+          text: BUILDING_TYPES.NON_RESIDENTIAL.text,
+          value: BUILDING_TYPES.NON_RESIDENTIAL.id
         },
         {
-          text: 'Residential institution',
-          value: 'Residential institution'
+          text: BUILDING_TYPES.RESIDENTIAL_INSTITUTION.text,
+          value: BUILDING_TYPES.RESIDENTIAL_INSTITUTION.id
         },
         {
-          text: 'Secure residential institution',
-          value: 'Secure residential institution'
+          text: BUILDING_TYPES.SECURE_RESIDENTIAL_INSTITUTION.text,
+          value: BUILDING_TYPES.SECURE_RESIDENTIAL_INSTITUTION.id
         }
       ],
-      id: FORM_LISTS_IDS.BUILDING_TYPES
+      id: FORM_LIST_IDS.BUILDING_TYPES
     },
     {
-      name: 'ctFVad',
+      name: FORM_LIST_NAMES.WASTE_WATER,
       title: 'List for question nulGtS',
       type: 'string',
       items: [
@@ -213,7 +200,7 @@ const definition = {
           value: 'On-site system'
         }
       ],
-      id: FORM_LISTS_IDS.WASTE_WATER
+      id: FORM_LIST_IDS.WASTE_WATER
     }
   ]
 }
