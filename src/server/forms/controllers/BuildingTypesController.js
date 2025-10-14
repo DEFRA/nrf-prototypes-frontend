@@ -1,4 +1,5 @@
 import { QuestionPageController } from '@defra/forms-engine-plugin/controllers/QuestionPageController.js'
+import { isPathRelative } from '@defra/forms-engine-plugin/engine/helpers.js'
 import { FORM_METADATA } from '../../common/constants/form-metadata.js'
 import { FORM_COMPONENT_NAMES } from '../../common/constants/form-component-names.js'
 import {
@@ -6,6 +7,10 @@ import {
   BUILDING_TYPES
 } from '../../common/constants/form-lists.js'
 import { ROUTES } from '../../common/constants/routes.js'
+
+const BUILDING_TYPE_FIELD_PREFIX = 'buildingType-'
+const MIN_QUANTITY = 0
+const MAX_QUANTITY = 5000
 
 /**
  * Custom controller for the building types page
@@ -18,6 +23,22 @@ export class BuildingTypesController extends QuestionPageController {
   }
 
   /**
+   * Helper to generate field name for a building type by index
+   * @param {number} index - 1-based index matching template loop.index
+   */
+  getBuildingTypeFieldName(index) {
+    return `${BUILDING_TYPE_FIELD_PREFIX}${index}`
+  }
+
+  /**
+   * Helper to check if a field name is a building type field
+   * @param {string} fieldName
+   */
+  isBuildingTypeField(fieldName) {
+    return fieldName.startsWith(BUILDING_TYPE_FIELD_PREFIX)
+  }
+
+  /**
    * Get the building types list definition from the form model
    */
   getBuildingTypesList() {
@@ -27,114 +48,216 @@ export class BuildingTypesController extends QuestionPageController {
   }
 
   /**
-   * Handle GET requests - display the building types form
-   * Populates the form with building types list and any previously saved values
+   * Validates a single building type field value
+   * @param {string} value - The field value to validate
+   * @param {string} fieldName - The field name
+   * @param {string} buildingTypeName - The human-readable building type name
+   * @returns {Object|null} Error object if validation fails, null if valid
    */
+  validateBuildingTypeValue(value, fieldName, buildingTypeName) {
+    if (value && value.toString().includes('.')) {
+      return {
+        path: fieldName,
+        name: fieldName,
+        href: `#${fieldName}`,
+        text: `${buildingTypeName}: Please enter a whole number (no decimals)`
+      }
+    }
+
+    const parsedValue = parseInt(value, 10)
+
+    if (isNaN(parsedValue)) {
+      return {
+        path: fieldName,
+        name: fieldName,
+        href: `#${fieldName}`,
+        text: `${buildingTypeName}: Please enter a valid number`
+      }
+    }
+
+    if (parsedValue < MIN_QUANTITY) {
+      return {
+        path: fieldName,
+        name: fieldName,
+        href: `#${fieldName}`,
+        text: `${buildingTypeName}: Value cannot be negative`
+      }
+    }
+
+    if (parsedValue > MAX_QUANTITY) {
+      return {
+        path: fieldName,
+        name: fieldName,
+        href: `#${fieldName}`,
+        text: `${buildingTypeName}: Value cannot exceed ${MAX_QUANTITY.toLocaleString()}`
+      }
+    }
+
+    return null // Valid
+  }
+
   makeGetRouteHandler() {
     return (request, context, h) => {
       const viewModel = this.getViewModel(request, context)
       const { state } = context
-
-      // Add building types list to view model
       const buildingTypesList = this.getBuildingTypesList()
-      viewModel.buildingTypes = buildingTypesList?.items || []
+      const savedValues = state[FORM_METADATA.PROTOTYPE_ID] || {}
 
-      // Restore previously entered values from session state
-      const savedValues = state[FORM_METADATA.PROTOTYPE_ID]
-      if (savedValues) {
-        viewModel.submittedValues = savedValues
+      viewModel.buildingTypes = buildingTypesList?.items || []
+      viewModel.submittedValues = {}
+
+      const buildingTypes = buildingTypesList?.items || []
+      for (let i = 0; i < buildingTypes.length; i++) {
+        const fieldName = this.getBuildingTypeFieldName(i + 1)
+        viewModel.submittedValues[fieldName] = savedValues[fieldName] ?? 0
       }
 
       return h.view(this.viewName, viewModel)
     }
   }
 
-  /**
-   * Handle POST requests - validate and save building types
-   * Requires at least one building with a quantity > 0
-   * Supports returnUrl for redirecting back to summary page
-   */
+  validateAndCollectPayload(buildingTypesList, payload) {
+    const validatedPayload = {}
+    const errors = []
+
+    buildingTypesList?.items.forEach((item, index) => {
+      const fieldName = this.getBuildingTypeFieldName(index + 1)
+      const value = payload[fieldName]
+      const validationError = this.validateBuildingTypeValue(
+        value,
+        fieldName,
+        item.text
+      )
+
+      if (validationError) {
+        errors.push(validationError)
+      }
+
+      validatedPayload[fieldName] = value
+    })
+
+    return { validatedPayload, errors }
+  }
+
+  calculateTotal(validatedPayload) {
+    return Object.values(validatedPayload)
+      .filter((value) => typeof value === 'string' && value !== '')
+      .map((value) => parseInt(value, 10))
+      .filter((value) => !isNaN(value))
+      .reduce((sum, value) => sum + value, 0)
+  }
+
+  checkBuildingTypeMix(buildingTypesList, validatedPayload) {
+    let hasNonResidential = false
+    let hasResidentialTypes = false
+
+    buildingTypesList?.items.forEach((item, index) => {
+      const fieldName = this.getBuildingTypeFieldName(index + 1)
+      const quantity = parseInt(validatedPayload[fieldName], 10) || 0
+
+      if (quantity > 0) {
+        if (item.value === BUILDING_TYPES.NON_RESIDENTIAL.id) {
+          hasNonResidential = true
+        } else {
+          hasResidentialTypes = true
+        }
+      }
+    })
+
+    return { hasNonResidential, hasResidentialTypes }
+  }
+
+  renderErrorView(
+    request,
+    context,
+    h,
+    buildingTypesList,
+    validatedPayload,
+    errors
+  ) {
+    return h.view(this.viewName, {
+      ...this.getViewModel(request, context),
+      buildingTypes: buildingTypesList?.items || [],
+      submittedValues: validatedPayload,
+      errors
+    })
+  }
+
+  getNextPageRedirect(query) {
+    const { returnUrl } = query
+    if (returnUrl && isPathRelative(returnUrl)) {
+      return returnUrl
+    }
+
+    const { next } = this.pageDef
+    if (!next || next.length === 0) {
+      throw new Error(
+        `No next page configured for ${FORM_COMPONENT_NAMES.BUILDING_TYPES}`
+      )
+    }
+
+    return `/${FORM_METADATA.SLUG}${next[0].path}`
+  }
+
   makePostRouteHandler() {
     return async (request, context, h) => {
       const { payload, query } = request
       const { state } = context
-
-      // Calculate total number of buildings across all types
-      const total = Object.values(payload)
-        .filter((value) => typeof value === 'string' && value !== '')
-        .map((value) => parseInt(value, 10))
-        .filter((value) => !isNaN(value))
-        .reduce((sum, value) => sum + value, 0)
-
-      // Validation: require at least one building
-      if (total === 0) {
-        const viewModel = this.getViewModel(request, context)
-
-        const buildingTypesList = this.getBuildingTypesList()
-        viewModel.buildingTypes = buildingTypesList?.items || []
-        viewModel.submittedValues = payload
-        viewModel.errors = [
-          {
-            path: FORM_COMPONENT_NAMES.BUILDING_TYPES,
-            name: FORM_COMPONENT_NAMES.BUILDING_TYPES,
-            href: '#buildingType-1',
-            text: 'Enter at least one building with a value of 1 or more'
-          }
-        ]
-
-        return h.view(this.viewName, viewModel)
-      }
-
-      // Save building types to session state (before any redirects)
-      await this.mergeState(request, state, {
-        [FORM_METADATA.PROTOTYPE_ID]: payload
-      })
-
-      // Check if only non-residential development was entered
       const buildingTypesList = this.getBuildingTypesList()
 
-      let hasNonResidential = false
-      let hasResidentialTypes = false
+      const { validatedPayload, errors } = this.validateAndCollectPayload(
+        buildingTypesList,
+        payload
+      )
 
-      // Check each building type
-      buildingTypesList?.items.forEach((item, index) => {
-        const fieldName = `buildingType-${index + 1}`
-        const quantity = parseInt(payload[fieldName], 10) || 0
+      if (errors.length > 0) {
+        return this.renderErrorView(
+          request,
+          context,
+          h,
+          buildingTypesList,
+          validatedPayload,
+          errors
+        )
+      }
 
-        if (quantity > 0) {
-          if (item.value === BUILDING_TYPES.NON_RESIDENTIAL.id) {
-            hasNonResidential = true
-          } else {
-            hasResidentialTypes = true
-          }
+      const total = this.calculateTotal(validatedPayload)
+
+      if (total === 0) {
+        return this.renderErrorView(
+          request,
+          context,
+          h,
+          buildingTypesList,
+          validatedPayload,
+          [
+            {
+              path: FORM_COMPONENT_NAMES.BUILDING_TYPES,
+              name: FORM_COMPONENT_NAMES.BUILDING_TYPES,
+              href: `#${this.getBuildingTypeFieldName(1)}`,
+              text: 'Enter at least one building with a value of 1 or more'
+            }
+          ]
+        )
+      }
+
+      await this.mergeState(request, state, {
+        [FORM_METADATA.PROTOTYPE_ID]: {
+          ...state[FORM_METADATA.PROTOTYPE_ID],
+          ...validatedPayload
         }
       })
 
-      // Redirect if only non-residential was entered
+      const { hasNonResidential, hasResidentialTypes } =
+        this.checkBuildingTypeMix(buildingTypesList, validatedPayload)
+
       if (hasNonResidential && !hasResidentialTypes) {
         return h.redirect(
           `/${FORM_METADATA.SLUG}${ROUTES.NON_RESIDENTIAL_ERROR}`
         )
       }
 
-      // Support returnUrl for "Change" links from summary page
-      const returnUrl = query.returnUrl
-      if (returnUrl) {
-        return h.redirect(returnUrl)
-      }
-
-      // Default: redirect to next page in form flow
-      const { next } = this.pageDef
-
-      if (!next || next.length === 0) {
-        throw new Error(
-          `No next page configured for ${FORM_COMPONENT_NAMES.BUILDING_TYPES}`
-        )
-      }
-
-      const fullPath = `/${FORM_METADATA.SLUG}${next[0].path}`
-
-      return h.redirect(fullPath)
+      return h.redirect(this.getNextPageRedirect(query))
     }
   }
 }

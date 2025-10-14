@@ -1,7 +1,9 @@
 import { SummaryPageController } from '@defra/forms-engine-plugin/controllers/SummaryPageController.js'
+import { formatFileSize } from '../../common/helpers/format-utils.js'
 import { FORM_LIST_NAMES } from '../../common/constants/form-lists.js'
 import { ROUTES } from '../../common/constants/routes.js'
 import { FORM_METADATA } from '../../common/constants/form-metadata.js'
+import { FORM_COMPONENT_NAMES } from '../../common/constants/form-component-names.js'
 
 export class NRFQuoteSummaryController extends SummaryPageController {
   constructor(model, pageDef) {
@@ -36,42 +38,67 @@ export class NRFQuoteSummaryController extends SummaryPageController {
       const fieldName = `buildingType-${index + 1}`
       const quantity = parseInt(buildingTypesData[fieldName], 10) || 0
 
-      formattedTypes.push({
-        type: item.text,
-        quantity,
-        value: item.value
-      })
-      rows.push([
-        {
-          text: item.text
-        },
-        {
-          text: quantity.toString(),
-          format: 'numeric'
-        }
-      ])
+      // Only include building types with quantity > 0
+      if (quantity > 0) {
+        formattedTypes.push({
+          type: item.text,
+          quantity,
+          value: item.value
+        })
+        rows.push([
+          {
+            text: item.text
+          },
+          {
+            text: quantity.toString(),
+            format: 'numeric'
+          }
+        ])
+      }
+
       totalBuildings += quantity
     })
 
     return { types: formattedTypes, rows, total: totalBuildings }
   }
 
+  formatBoundaryFile(state) {
+    const prototypeData = state[FORM_METADATA.PROTOTYPE_ID]
+    const fileData = prototypeData?.[FORM_COMPONENT_NAMES.BOUNDARY_FILE]
+
+    if (!fileData || !fileData.filename) {
+      return null
+    }
+
+    return {
+      filename: fileData.filename,
+      size: formatFileSize(fileData.size || 0),
+      uploadedAt: fileData.uploadedAt
+    }
+  }
+
   makeGetRouteHandler() {
     return async (request, context, h) => {
       const { state } = context
+
       const buildingTypes = this.formatBuildingTypes(state)
+      const boundaryFile = this.formatBoundaryFile(state)
 
       // Call parent to get the summary view model
       const response = await super.makeGetRouteHandler()(request, context, h)
 
-      // If it's a view response, add our building types data
+      // If it's a view response, add our custom data
       if (response && response.variety === 'view') {
         const summaryUrl = `/${FORM_METADATA.SLUG}${ROUTES.SUMMARY}`
         const buildingTypesUrl = `/${FORM_METADATA.SLUG}${ROUTES.BUILDINGS}`
         const buildingTypesChangeUrl = `${buildingTypesUrl}?returnUrl=${encodeURIComponent(summaryUrl)}`
+        const boundaryFileUrl = `/${FORM_METADATA.SLUG}${ROUTES.UPLOAD}`
+        const boundaryFileChangeUrl = `${boundaryFileUrl}?returnUrl=${encodeURIComponent(summaryUrl)}`
 
         response.source.context.buildingTypes = buildingTypes
         response.source.context.buildingTypesChangeUrl = buildingTypesChangeUrl
+        response.source.context.boundaryFile = boundaryFile
+        response.source.context.boundaryFileChangeUrl = boundaryFileChangeUrl
       }
 
       return response
