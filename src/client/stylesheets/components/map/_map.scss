@@ -1,0 +1,13 @@
+// FloodMap component styles
+// These styles ensure the map container and its children have proper heights
+// for the Esri SDK to render correctly
+
+.fm-o-main {
+  height: 600px;
+}
+
+.fm-o-viewport,
+.esri-view {
+  height: 100%;
+  min-height: 600px;
+}

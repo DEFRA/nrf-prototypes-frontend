@@ -219,6 +219,22 @@ export const config = convict({
       default: 'x-cdp-request-id',
       env: 'TRACING_HEADER'
     }
+  },
+  osMaps: {
+    apiKey: {
+      doc: 'OS Maps API Key from OS Data Hub',
+      format: String,
+      default: '',
+      sensitive: true,
+      env: 'OS_MAPS_API_KEY'
+    },
+    apiSecret: {
+      doc: 'OS Maps API Secret from OS Data Hub',
+      format: String,
+      default: '',
+      sensitive: true,
+      env: 'OS_MAPS_API_SECRET'
+    }
   }
 })
 

@@ -4,7 +4,7 @@ govukFileUpload %} {% from "govuk/components/tag/macro.njk" import govukTag %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% block content %}
 <div class="govuk-grid-row">
-  <div class="govuk-grid-column-two-thirds">
+  <div class="govuk-grid-column-full">
     {% if errors %} {{ govukErrorSummary({ titleText: "There is a problem",
     errorList: checkErrorTemplates(errors) }) }} {% endif %}
 
@@ -17,6 +17,20 @@ govukFileUpload %} {% from "govuk/components/tag/macro.njk" import govukTag %}
       be. If you already have a shapefile you can upload it for your Nature
       Restoration Fund levy estimate.
     </p>
+
+    <div
+      id="map"
+      style="
+        width: 100%;
+        /* position: absolute;
+        top: 0;
+        left: 0; */
+        background-color: #f3f2f1;
+        height: 600px;
+        margin-bottom: 2rem;
+        border: 2px solid #b1b4b6;
+      "
+    ></div>
 
     <form method="post">
       <h2 class="govuk-heading-m">Select a file</h2>
@@ -70,7 +84,9 @@ govukFileUpload %} {% from "govuk/components/tag/macro.njk" import govukTag %}
             </span>
           </summary>
           <div class="govuk-details__text">
-            <pre class="file-content-preview"><code>{{ uploadedFile.content | e }}</code></pre>
+            <pre
+              class="file-content-preview"
+            ><code>{{ uploadedFile.content | e }}</code></pre>
           </div>
         </details>
       </div>

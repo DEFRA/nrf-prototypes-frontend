@@ -51,7 +51,9 @@ export default {
   },
   resolve: {
     alias: {
-      '/public/assets': path.join(govukFrontendPath, 'dist/govuk/assets')
+      '/public/assets': path.join(govukFrontendPath, 'dist/govuk/assets'),
+      '/flood-map': path.join(dirname, 'defra-map/src/flood-map.js'),
+      '/@arcgis-path': path.join(dirname, 'defra-map/node_modules/@arcgis')
     }
   },
   module: {
@@ -62,14 +64,18 @@ export default {
         enforce: 'pre'
       },
       {
-        test: /\.js$/,
+        test: /\.(js|jsx)$/,
         loader: 'babel-loader',
         exclude: /node_modules/,
+        include: [
+          path.join(dirname, 'src/client'),
+          path.join(dirname, 'defra-map/src')
+        ],
         options: {
           browserslistEnv: 'javascripts',
           cacheDirectory: true,
           extends: path.join(dirname, 'babel.config.cjs'),
-          presets: [['@babel/preset-env']]
+          presets: [['@babel/preset-env'], ['@babel/preset-react']]
         },
 
         // Flag loaded modules as side effect free
